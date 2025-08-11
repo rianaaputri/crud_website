@@ -40,7 +40,7 @@
                         </div>
 
                         <button type="submit" class="btn btn-primary w-100">Register</button>
-                        <p class="text-center mt-3">Sudah punya akun? <a href="{{ route('customer.login') }}">Login di sini</a></p>
+                        <p class="text-center mt-3">Sudah punya akun? <a href="{{ route('login') }}">Login di sini</a></p>
                     </form>
                 </div>
             </div>

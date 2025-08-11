@@ -3,6 +3,18 @@
 <head>
     <title>Registrasi Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .password-toggle {
+            cursor: pointer;
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .position-relative input {
+            padding-right: 40px;
+        }
+    </style>
 </head>
 <body class="bg-light">
 
@@ -38,14 +50,16 @@
                             <input type="email" name="email" class="form-control" placeholder="Email" required>
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-3 position-relative">
                             <label class="form-label">Password</label>
-                            <input type="password" name="password" class="form-control" placeholder="Password" required>
+                            <input type="password" name="password" class="form-control" id="password" placeholder="Password" required>
+                            <span class="password-toggle" onclick="togglePassword('password')">&#128065;</span>
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-3 position-relative">
                             <label class="form-label">Konfirmasi Password</label>
-                            <input type="password" name="password_confirmation" class="form-control" placeholder="Konfirmasi Password" required>
+                            <input type="password" name="password_confirmation" class="form-control" id="password_confirmation" placeholder="Konfirmasi Password" required>
+                            <span class="password-toggle" onclick="togglePassword('password_confirmation')">&#128065;</span>
                         </div>
 
                         <button type="submit" class="btn btn-primary w-100">Daftar</button>
@@ -53,13 +67,24 @@
                 </div>
 
                 <div class="card-footer text-center">
-                    Sudah punya akun? <a href="{{ route('admin.login') }}">Login di sini</a>
+                    Sudah punya akun? <a href="{{ route('login') }}">Login di sini</a>
                 </div>
             </div>
 
         </div>
     </div>
 </div>
+
+<script>
+    function togglePassword(id) {
+        const field = document.getElementById(id);
+        if (field.type === "password") {
+            field.type = "text";
+        } else {
+            field.type = "password";
+        }
+    }
+</script>
 
 </body>
 </html>

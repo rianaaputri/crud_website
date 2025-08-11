@@ -25,8 +25,8 @@
                 <tbody>
                     @foreach($transactions as $trx)
                         <tr>
-                            <td>{{ $trx->customer->name ?? '-' }}</td>
-                            <td>{{ $trx->product->customer->store_name ?? '-' }}</td>
+                            <td>{{ $trx->user->name ?? '-' }}</td>
+                            <td>{{ $trx->product->user->store_name ?? '-' }}</td>
                             <td>{{ $trx->product->title ?? '-' }}</td>
                             <td class="text-center">
                                 @if($trx->product && $trx->product->image)

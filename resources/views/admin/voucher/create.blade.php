@@ -16,32 +16,29 @@
 
     <form action="{{ route('admin.voucher.store') }}" method="POST">
         @csrf
+        {{-- Kode Voucher --}}
         <div class="mb-3">
-            <label for="kode">Kode Voucher</label>
-            <input type="text" name="kode" id="kode" class="form-control" required>
+            <label for="code" class="form-label">Kode Voucher</label>
+            <input type="text" name="code" id="code" class="form-control" required>
         </div>
 
+        {{-- Nilai Diskon --}}
         <div class="mb-3">
-            <label for="jenis_diskon">Jenis Diskon</label>
-            <select name="jenis_diskon" id="jenis_diskon" class="form-control" required>
-                <option value="persen">Persentase (%)</option>
-                <option value="nominal">Nominal (Rp)</option>
-            </select>
+            <label for="discount" class="form-label">Nilai Diskon</label>
+            <input type="number" name="discount" id="discount" class="form-control" required>
+            <small class="text-muted">Masukkan nilai diskon dalam angka. Gunakan persen atau nominal sesuai kebijakan.</small>
         </div>
 
+        {{-- Tanggal Mulai Berlaku --}}
         <div class="mb-3">
-            <label for="nilai_diskon">Nilai Diskon</label>
-            <input type="number" name="nilai_diskon" id="nilai_diskon" class="form-control" required>
+            <label for="valid_from" class="form-label">Berlaku Dari</label>
+            <input type="date" name="valid_from" id="valid_from" class="form-control">
         </div>
 
+        {{-- Tanggal Kadaluarsa --}}
         <div class="mb-3">
-            <label for="minimal_belanja">Minimal Belanja</label>
-            <input type="number" name="minimal_belanja" id="minimal_belanja" class="form-control">
-        </div>
-
-        <div class="mb-3">
-            <label for="tanggal_kadaluarsa">Tanggal Kadaluarsa</label>
-            <input type="date" name="tanggal_kadaluarsa" id="tanggal_kadaluarsa" class="form-control" required>
+            <label for="valid_until" class="form-label">Berlaku Sampai</label>
+            <input type="date" name="valid_until" id="valid_until" class="form-control">
         </div>
 
         <button type="submit" class="btn btn-primary">Simpan</button>

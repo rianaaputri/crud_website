@@ -8,7 +8,7 @@ class transaction extends Model
 {
     protected $fillable = [
     'product_id',
-    'customer_id',
+    'user_id',
     'quantity',
     'total_price',
     'payment_amount',
@@ -16,13 +16,16 @@ class transaction extends Model
     'payment_method',
     'status'
 ];
+
+
 public function product()
 {
     return $this->belongsTo(Product::class);
 }
-public function customer()
-{
-    return $this->belongsTo(Customer::class);
-}
+   public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
 
 }

@@ -6,8 +6,8 @@
     <title>Read Produk</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
 </head>
+
 <body style="background: lightgray">
 {{-- Navbar --}}
 <nav class="navbar navbar-light bg-white shadow-sm px-4 mb-4">
@@ -15,10 +15,9 @@
         <a class="navbar-brand fw-bold text-dark" href="{{ route('products.index') }}">
             🛍️ RiriShop
         </a>
-
         <div class="d-flex align-items-center gap-2">
           @guest('customer')
-    <a href="{{ route('customer.login') }}" class="btn btn-outline-primary">🔐 Login</a>
+    <a href="{{ route('login') }}" class="btn btn-outline-primary">🔐 Login</a>
     <a href="{{ route('customer.register') }}" class="btn btn-outline-success">📝 Daftar</a>
 @else
     <a href="{{ route('products.index') }}" class="btn btn-outline-dark">🏠 Home</a>
@@ -30,7 +29,6 @@
         <a href="{{ route('customer.seller.form') }}" class="btn btn-warning">✨ Mulai Jual</a>
     @endif
 @endguest
-
 
             {{-- Dropdown Profil --}}
             @if(auth('customer')->check())
@@ -47,7 +45,7 @@
                     @endif
                     <li><hr class="dropdown-divider"></li>
                     <li>
-                        <form action="{{ route('customer.logout') }}" method="POST">
+                        <form action="{{ route('logout') }}" method="POST">
                             @csrf
                             <button type="submit" class="dropdown-item text-danger">🚪 Logout</button>
                         </form>
@@ -62,10 +60,7 @@
 <div class="container mt-5">
     <div class="row">
         <div class="col-md-12">
-           
-
             @if(auth('customer')->check())
-          
 </div>
   @endif<form action="{{ route('products.index') }}" method="GET" class="mb-4">
     <div class="position-relative">
@@ -116,7 +111,31 @@
         });
     });
 </script>
+@if(isset($vouchers) && $vouchers->count() > 0)
+    <div class="mb-5 p-4 bg-white rounded shadow-sm">
+        <h4 class="mb-4">🎟️ Voucher Tersedia</h4>
+        <div class="row g-3">
+            @foreach($vouchers as $voucher)
+                <div class="col-md-4">
+                    <div class="card p-3 h-100 border-success">
+                        <h5 class="text-success">{{ $voucher->code }}</h5>
+                        <p class="mb-1">Diskon: <strong>{{ $voucher->discount }}</strong></p>
+                        <p class="text-muted" style="font-size: 0.9rem;">
+                            Berlaku: 
+                            {{ $voucher->valid_from ? $voucher->valid_from->format('d M Y') : '-' }} 
+                            s/d 
+                            {{ $voucher->valid_until ? $voucher->valid_until->format('d M Y') : '-' }}
+                        </p>
+                        <button class="btn btn-sm btn-outline-success w-100 btn-use-voucher" data-code="{{ $voucher->code }}">
+    Gunakan
+</button>
 
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    </div>
+@endif
             <div class="row">
                 @forelse ($products as $product)
                     <div class="col-md-4 mb-4">
@@ -137,11 +156,11 @@
                                     <a href="{{ route('products.show', $product->id) }}" class="btn btn-sm btn-dark">SHOW</a>
 
                                     @if(auth('customer')->check())
-                                        <button type="button" class="btn btn-sm btn-success mt-2" data-bs-toggle="modal" data-bs-target="#buyModal{{ $product->id }}">
-                                            BUY
-                                        </button>
+                                       <a href="{{ route('checkout.show', ['product_id' => $product->id, 'voucher_code' => request('voucher_code')]) }}" class="btn btn-sm btn-success mt-2">BUY</a>
+
+
                                     @else
-                                        <a href="{{ route('customer.login') }}" class="btn btn-sm btn-warning mt-2">Login untuk membeli</a>
+                                        <a href="{{ route('login') }}" class="btn btn-sm btn-warning mt-2">Login untuk membeli</a>
                                     @endif
                                 </form>
                             </div>
@@ -172,28 +191,28 @@
                                             <label class="form-label">Total Harga</label>
                                             <input type="text" id="total_price_{{ $product->id }}" class="form-control" readonly>
                                         </div>
+    
                                         <div class="mb-3">
                                             <label class="form-label">Jumlah Uang Dibayar</label>
                                             <input type="number" name="payment_amount" class="form-control" placeholder="Rp." required>
                                         </div>
+
                                         <div class="mb-3">
-                                            <label class="form-label">Metode Pembayaran</label>
-                                            <select name="payment_method" class="form-select" required>
-                                                <option value="" disabled selected>Pilih</option>
-                                                <option value="tunai">Tunai</option>
-                                                <option value="transfer">Transfer</option>
-                                                <option value="qris">QRIS</option>
-                                            </select>
-                                        </div>
-                                        <div class="mb-3">
-    <label class="form-label">Kode Voucher (Opsional)</label>
-    <input type="text" name="voucher" class="form-control" placeholder="Masukkan kode voucher jika ada">
+    <label class="form-label">Jumlah Uang Dibayar</label>
+    <input type="number" name="payment_amount" class="form-control" placeholder="Rp." required>
 </div>
 
-                                    </div>
+
+                                      
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                        <button type="submit" class="btn btn-primary">Bayar</button>
+                                        <button type="button" class="btn btn-primary btn-pay" 
+                                            data-product-id="{{ $product->id }}" 
+                                            data-title="{{ $product->title }}"
+                                            data-price="{{ $product->price }}">
+                                            Bayar
+                                        </button>
+
                                     </div>
                                 </form>
                             </div>
@@ -205,8 +224,8 @@
             </div>
 
             <div class="mt-4">
-    {{ $products->withQueryString()->links() }}
-</div>
+                {{ $products->withQueryString()->links() }}
+            </div>
 
         </div>
     </div>
@@ -253,6 +272,108 @@
                 });
             }
         @endforeach
+    });
+</script>
+    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.clientKey') }}"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        $('.btn-pay').on('click', function () {
+            let productId = $(this).data('product-id');
+            let quantity = $(`#buyModal${productId} input[name='quantity']`).val();
+            let paymentMethod = $(`#buyModal${productId} select[name='payment_method']`).val();
+
+            if (!quantity || quantity <= 0) {
+                return Swal.fire("Ups!", "Jumlah tidak boleh kosong", "warning");
+            }
+
+            $.ajax({
+                url: "{{ route('midtrans.token') }}",
+                method: "POST",
+                headers: {
+                    'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                },
+                data: {
+                    product_id: productId,
+                    quantity: quantity,
+                    payment_method: paymentMethod,
+                },
+                success: function (res) {
+                    snap.pay(res.snap_token, {
+                        onSuccess: function (result) {
+                            window.location.href = "{{ route('transactions.success') }}";
+                        },
+                        onPending: function (result) {
+                            window.location.href = "{{ route('transactions.pending') }}";
+                        },
+                        onError: function (result) {
+                            Swal.fire("Gagal", "Transaksi gagal diproses", "error");
+                        }
+                    });
+                },
+                error: function (xhr) {
+                    Swal.fire("Error", "Gagal mendapatkan token transaksi", "error");
+                }
+            });
+        });
+    });
+</script>
+<script>
+document.querySelectorAll('input[name="voucher_code"]').forEach(function(input) {
+    input.addEventListener('blur', function() {
+        let code = this.value;
+        let productId = this.closest('.modal').querySelector('input[name="product_id"]').value;
+        let qty = this.closest('.modal').querySelector('input[name="quantity"]').value;
+
+        if (code && qty > 0) {
+            fetch(`/check-voucher?code=${code}&product_id=${productId}&qty=${qty}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.valid) {
+                        alert(`Voucher valid! Diskon: Rp ${data.discount}`);
+                        this.closest('.modal').querySelector('[id^="total_price_"]').value = 
+                            new Intl.NumberFormat('id-ID', {style: 'currency', currency: 'IDR'}).format(data.final_total);
+                    } else {
+                        alert('Voucher tidak valid');
+                    }
+                });
+        }
+    });
+});
+</script>
+<script>
+    // Fungsi copy kode voucher ke input pencarian atau form voucher di checkout (opsional)
+    function copyKode(code) {
+        // Contoh: copy ke input voucher di halaman ini (sesuaikan id input voucher kamu)
+        const voucherInputs = document.querySelectorAll('input[name="voucher_code"]');
+        voucherInputs.forEach(input => {
+            input.value = code;
+            input.dispatchEvent(new Event('blur')); // trigger validasi voucher jika ada
+        });
+    }
+
+    // Event listener tombol "Gunakan"
+    document.querySelectorAll('.btn-use-voucher').forEach(button => {
+        button.addEventListener('click', function () {
+            const code = this.getAttribute('data-code');
+            copyKode(code); // opsional, copy kode voucher ke input voucher
+
+            // Ubah tombol menjadi "Digunakan" dan nonaktifkan
+            this.textContent = "Digunakan";
+            this.disabled = true;
+            this.classList.remove('btn-outline-success');
+            this.classList.add('btn-success');
+
+            // Jika ingin supaya hanya satu voucher yang bisa dipakai, matikan tombol lain
+            document.querySelectorAll('.btn-use-voucher').forEach(btn => {
+                if (btn !== this) {
+                    btn.textContent = "Gunakan";
+                    btn.disabled = false;
+                    btn.classList.remove('btn-success');
+                    btn.classList.add('btn-outline-success');
+                }
+            });
+        });
     });
 </script>
 

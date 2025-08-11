@@ -25,7 +25,7 @@
                             <a class="nav-link" href="{{ route('customer.profile') }}">Profil</a>
                         </li>
                         <li class="nav-item">
-                            <form action="{{ route('customer.logout') }}" method="POST">
+                            <form action="{{ route('logout') }}" method="POST">
                                 @csrf
                                 <button type="submit" class="btn btn-link nav-link">Logout</button>
                             </form>
@@ -35,7 +35,7 @@
                             <a class="nav-link" href="{{ route('admin.dashboard') }}">Dashboard</a>
                         </li>
                         <li class="nav-item">
-                            <form action="{{ route('admin.logout') }}" method="POST">
+                            <form action="{{ route('logout') }}" method="POST">
                                 @csrf
                                 <button type="submit" class="btn btn-link nav-link">Logout</button>
                             </form>

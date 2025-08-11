@@ -62,7 +62,7 @@
                 <span class="navbar-brand">Dashboard</span>
                 <div class="d-flex">
                     <a href="{{ route('admin.register') }}" class="btn btn-outline-primary me-2">Tambah Admin</a>
-                    <a href="{{ route('admin.logout') }}" class="btn btn-outline-danger">Logout</a>
+                    <a href="{{ route('logout') }}" class="btn btn-outline-danger">Logout</a>
                 </div>
             </div>
         </nav>

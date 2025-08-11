@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Voucher; 
 //import model product
 use App\Models\Product; 
 
@@ -23,10 +24,12 @@ class ProductController extends Controller
      * index
      *
      * @return void
-     */public function index(Request $request)
+     */
+    public function index(Request $request)
 {
-    $query = Product::query();
-     if (auth('customer')->check()) {
+   $query = Product::query();
+
+    if (auth('customer')->check()) {
         $query->where('customer_id', '!=', auth('customer')->id());
     }
 
@@ -37,8 +40,20 @@ class ProductController extends Controller
 
     $products = $query->paginate(20);
 
-    return view('products.index', compact('products'));
+    // Ambil voucher yang masih berlaku
+    $vouchers = Voucher::where(function ($q) {
+            $q->whereNull('valid_from')
+              ->orWhere('valid_from', '<=', now());
+        })
+        ->where(function ($q) {
+            $q->whereNull('valid_until')
+              ->orWhere('valid_until', '>=', now());
+        })
+        ->get();
+
+    return view('products.index', compact('products', 'vouchers'));
 }
+
 
 
     /**

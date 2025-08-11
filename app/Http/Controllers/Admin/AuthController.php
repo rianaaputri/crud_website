@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\WelcomeUserMail;
-use App\Models\Customer;
+use App\Models\User;
 
 class AuthController extends Controller
 {
@@ -36,29 +36,50 @@ public function register(Request $request)
     Mail::to($admin->email)->send(new WelcomeUserMail($admin));
     Auth::guard('admin')->login($admin);
 
-    return redirect()->route('admin.login')->with('success', 'Registrasi admin berhasil!');
+    return redirect()->route('login')->with('success', 'Registrasi admin berhasil!');
 }
     public function showLoginForm()
     {
-        return view('admin.login');
+        return view('login');
     }
 
-    public function login(Request $request)
-    {
-        $credentials = $request->only('email', 'password');
+   public function login(Request $request)
+{
+    $credentials = $request->only('email', 'password');
 
-        if (Auth::guard('admin')->attempt($credentials)) {
-            return redirect()->route('admin.dashboard');
-        }
-
-        return back()->withErrors(['email' => 'Email atau password salah.']);
+    // Coba login admin dulu
+    if (Auth::guard('admin')->attempt($credentials)) {
+        $request->session()->regenerate();
+        return redirect()->route('admin.dashboard');
     }
 
-    public function logout()
-    {
+    // Kalau bukan admin, coba login customer
+    if (Auth::guard('customer')->attempt($credentials)) {
+        $request->session()->regenerate();
+        return redirect()->route('products.index'); // dashboard customer
+    }
+
+    // Kalau gagal semua
+    return back()->with('error', 'Email atau password salah');
+}
+
+public function logout(Request $request)
+{
+    if (Auth::guard('admin')->check()) {
         Auth::guard('admin')->logout();
-        return redirect()->route('admin.login');
+    } elseif (Auth::guard('customer')->check()) {
+        Auth::guard('customer')->logout();
+    } else {
+        Auth::guard('web')->logout();
     }
+
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+
+    return redirect('/');
+}
+
+ 
     public function dashboard()
 {
     $customers = Customer::where('role', 'customer')->get();

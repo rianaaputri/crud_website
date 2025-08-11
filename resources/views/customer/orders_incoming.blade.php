@@ -17,15 +17,19 @@
             <a href="{{ route('products.index') }}" class="btn btn-outline-dark">🏠 Home</a>
             {{-- Profil --}}
             <div class="dropdown">
+                @php
+    use Illuminate\Support\Facades\Auth;
+@endphp
+
                 <button class="btn btn-light border rounded-circle dropdown-toggle d-flex align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <img src="https://ui-avatars.com/api/?name={{ urlencode($customer->name) }}" alt="Avatar"
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}" alt="Avatar"
                          class="rounded-circle me-2" style="width: 40px; height: 40px;">
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
                     <li><a class="dropdown-item" href="{{ route('customer.profile') }}">👤 Profil Saya</a></li>
                     <li><hr class="dropdown-divider"></li>
                     <li>
-                        <form action="{{ route('customer.logout') }}" method="POST">
+                        <form action="{{ route('logout') }}" method="POST">
                             @csrf
                             <button type="submit" class="dropdown-item text-danger">🚪 Logout</button>
                         </form>
@@ -58,7 +62,7 @@
                     @php $grandTotal = 0; @endphp
                     @foreach($transactions as $trx)
                         <tr>
-                            <td>{{ $trx->customer->name ?? '-' }}</td>
+                            <td>{{ $trx->user->name ?? '-' }}</td>
                             <td>
                                 {{ $trx->product->title ?? '-' }} <br>
                                 @if($trx->product && $trx->product->image)

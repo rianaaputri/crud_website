@@ -30,7 +30,7 @@
                 </a>
             @endif
 @auth('customer')
-    <a href="{{ route('customer.orders') }}" class="btn btn-outline-secondary">🧾 Pesanan Saya</a>
+    <a href="{{ route('customer.orders.incoming') }}" class="btn btn-outline-secondary">🧾 Pesanan Saya</a>
 @endauth
 
             {{-- Dropdown Profil --}}
@@ -50,7 +50,7 @@
                     <li><a class="dropdown-item" href="{{ route('customer.profile') }}">👤 Profil Saya</a></li>
                     <li><hr class="dropdown-divider"></li>
                     <li>
-                        <form action="{{ route('customer.logout') }}" method="POST">
+                        <form action="{{ route('logout') }}" method="POST">
                             @csrf
                             <button type="submit" class="dropdown-item text-danger">🚪 Logout</button>
                         </form>

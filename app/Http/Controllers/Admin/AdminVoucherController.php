@@ -1,46 +1,46 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
-use App\Http\Controllers\Controller;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Voucher;
+
 class AdminVoucherController extends Controller
 {
-   public function index()
-{
-    $vouchers = Voucher::latest()->get();
-    return view('admin.voucher.index', compact('vouchers'));
-}
-  public function create()
+    // Menampilkan daftar voucher
+    public function index()
+    {
+        $vouchers = Voucher::latest()->get();
+        return view('admin.voucher.index', compact('vouchers'));
+    }
+
+    // Form membuat voucher baru
+    public function create()
     {
         return view('admin.voucher.create');
     }
 
     // Simpan voucher baru
     public function store(Request $request)
-{
-    $request->validate([
-        'kode' => 'required|unique:vouchers,kode',
-        'jenis_diskon' => 'required|in:persen,nominal',
-        'nilai_diskon' => 'required|numeric|min:0',
-        'minimal_belanja' => 'nullable|numeric|min:0',
-        'tanggal_kadaluarsa' => 'required|date|after:today',
-    ]);
+    {
+        $request->validate([
+            'code'        => 'required|string|unique:vouchers,code',
+            'discount'    => 'required|numeric|min:0',
+            'valid_from'  => 'nullable|date',
+            'valid_until' => 'nullable|date|after_or_equal:valid_from',
+        ]);
 
-    Voucher::create([
-        'kode' => $request->kode,
-        'jenis_diskon' => $request->jenis_diskon,
-        'nilai_diskon' => $request->nilai_diskon,
-        'minimal_belanja' => $request->minimal_belanja ?? 0,
-        'tanggal_kadaluarsa' => $request->tanggal_kadaluarsa,
-    ]);
+        Voucher::create([
+            'code'        => $request->code,
+            'discount'    => $request->discount,
+            'valid_from'  => $request->valid_from,
+            'valid_until' => $request->valid_until,
+        ]);
 
-    return redirect()->route('admin.voucher.index')->with('success', 'Voucher berhasil dibuat.');
-}
+        return redirect()->route('admin.voucher.index')->with('success', 'Voucher berhasil dibuat.');
+    }
 
-
-    
     // Form edit voucher
     public function edit($id)
     {
@@ -50,29 +50,26 @@ class AdminVoucherController extends Controller
 
     // Simpan perubahan voucher
     public function update(Request $request, $id)
-{
-    $voucher = Voucher::findOrFail($id);
+    {
+        $voucher = Voucher::findOrFail($id);
 
-    $request->validate([
-        'kode' => 'required|unique:vouchers,kode,' . $voucher->id,
-        'jenis_diskon' => 'required|in:persen,nominal',
-        'nilai_diskon' => 'required|numeric|min:0',
-        'minimal_belanja' => 'nullable|numeric|min:0',
-        'tanggal_kadaluarsa' => 'required|date|after:today',
-    ]);
+        $request->validate([
+            'code'        => 'required|string|unique:vouchers,code,' . $voucher->id,
+            'discount'    => 'required|numeric|min:0',
+            'valid_from'  => 'nullable|date',
+            'valid_until' => 'nullable|date|after_or_equal:valid_from',
+        ]);
 
-    $voucher->update([
-        'kode' => $request->kode,
-        'jenis_diskon' => $request->jenis_diskon,
-        'nilai_diskon' => $request->nilai_diskon,
-        'minimal_belanja' => $request->minimal_belanja ?? 0,
-        'tanggal_kadaluarsa' => $request->tanggal_kadaluarsa,
-    ]);
+        $voucher->update([
+            'code'        => $request->code,
+            'discount'    => $request->discount,
+            'valid_from'  => $request->valid_from,
+            'valid_until' => $request->valid_until,
+        ]);
 
-    return redirect()->route('admin.voucher.index')->with('success', 'Voucher berhasil diperbarui.');
-}
+        return redirect()->route('admin.voucher.index')->with('success', 'Voucher berhasil diperbarui.');
+    }
 
-    // Hapus voucher
     public function destroy($id)
     {
         $voucher = Voucher::findOrFail($id);
@@ -80,5 +77,4 @@ class AdminVoucherController extends Controller
 
         return redirect()->route('admin.voucher.index')->with('success', 'Voucher berhasil dihapus.');
     }
-
 }

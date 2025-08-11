@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('transactions', function (Blueprint $table) {
-         Schema::table('transactions', function (Blueprint $table) {
+    Schema::table('transactions', function (Blueprint $table) {
+    Schema::table('transactions', function (Blueprint $table) {
     $table->decimal('diskon', 10, 2)->nullable();
     $table->decimal('total', 10, 2)->nullable();
     $table->string('voucher_kode')->nullable();

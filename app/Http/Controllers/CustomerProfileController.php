@@ -56,5 +56,12 @@ class CustomerProfileController extends Controller
 
     return view('customer.shop', compact('customer', 'products'));
 }
+public function tokoPublic($id)
+{
+    $customer = \App\Models\Customer::findOrFail($id);
+    $products = $customer->products; // relasi harus ada
+
+    return view('customer.shop', compact('customer', 'products'));
+}
 
 }

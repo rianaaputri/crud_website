@@ -12,12 +12,12 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($customers as $customer)
+            @foreach ($users as $user)
             <tr>
-                <td>{{ $customer->name }}</td>
-                <td>{{ $customer->email }}</td>
+                <td>{{ $user->name }}</td>
+                <td>{{ $user->email }}</td>
                 <td>
-                    <a href="{{ route('admin.seller.show', $customer->id) }}" class="btn btn-info btn-sm">Lihat</a>
+                    <a href="{{ route('admin.seller.show', $user->id) }}" class="btn btn-info btn-sm">Lihat</a>
                 </td>
             </tr>
             @endforeach

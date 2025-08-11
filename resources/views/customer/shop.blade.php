@@ -26,10 +26,10 @@
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
                     <li><a class="dropdown-item" href="{{ route('customer.profile') }}">👤 Profil Saya</a></li>
-                    <li><a class="dropdown-item" href="{{ route('customer.shop') }}">🛒 Toko Anda</a></li>
+                    <li><a class="dropdown-item" href="{{ route('customer.shop', Auth::guard('customer')->user()->id) }}">🛒 Toko Anda</a></li>
                     <li><hr class="dropdown-divider"></li>
                     <li>
-                        <form action="{{ route('customer.logout') }}" method="POST">
+                        <form action="{{ route('logout') }}" method="POST">
                             @csrf
                             <button type="submit" class="dropdown-item text-danger">🚪 Logout</button>
                         </form>

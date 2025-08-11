@@ -42,7 +42,7 @@ return [
     ],
     'customer' => [ 
         'driver' => 'session',
-        'provider' => 'customers',
+        'provider' => 'users',
     ],
      'admin' => [
     'driver' => 'session',
@@ -75,12 +75,13 @@ return [
 
     'customers' => [
         'driver' => 'eloquent',
-        'model' => App\Models\Customer::class,
+        'model' => App\Models\User::class,
     ],
-     'admins' => [
+    'admins' => [
         'driver' => 'eloquent',
         'model' => App\Models\Admin::class,
-    ],
+],
+
 ],
 
 
@@ -112,7 +113,7 @@ return [
     ],
 
     'customers' => [
-        'provider' => 'customers',
+        'provider' => 'users',
         'table' => 'password_reset_tokens',
         'expire' => 60,
         'throttle' => 60,

@@ -1,19 +1,46 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 class Voucher extends Model
 {
+    // Nama tabel
     protected $table = 'vouchers';
-       protected $fillable = [
-        'kode',
-        'jenis_diskon',
-        'nilai_diskon',
-        'minimal_belanja',
-        'tanggal_kadaluarsa',
+
+    // Kolom yang boleh diisi
+    protected $fillable = [
+        'code',
+        'discount',
+        'valid_from',
+        'valid_until',
     ];
 
-    // Jika kolom tanggal_kadaluarsa kamu berupa date:
-    protected $dates = ['tanggal_kadaluarsa'];
+    // Cast tanggal menjadi objek Carbon
+    protected $casts = [
+        'valid_from' => 'date',
+        'valid_until' => 'date',
+    ];
+
+    /**
+     * Cek apakah voucher masih berlaku.
+     *
+     * @return bool
+     */
+    public function isValid(): bool
+    {
+        $today = Carbon::today();
+
+        if ($this->valid_from && $today->lt($this->valid_from)) {
+            return false;
+        }
+
+        if ($this->valid_until && $today->gt($this->valid_until)) {
+            return false;
+        }
+
+        return true;
+    }
 }

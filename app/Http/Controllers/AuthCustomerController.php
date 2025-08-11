@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Customer;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -11,47 +11,78 @@ use App\Mail\WelcomeUserMail;
 
 class AuthCustomerController extends Controller
 {
-    public function showRegisterForm() {
-        return view('customer.register');
+    public function showRegisterForm()
+    {
+        return view('customer.register'); // pastikan view ini ada
     }
 
-    public function register(Request $request) {
+    public function register(Request $request)
+    {
         $request->validate([
-            'name' => 'required',
-            'email' => 'required|email|unique:customers',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6|confirmed',
+            'role' => 'required|in:customer,seller' // pastikan ada pilihan role
         ]);
 
-        $customer = Customer::create([
+        $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => bcrypt($request->password),
+            'password' => Hash::make($request->password),
+            'role' => $request->role,
         ]);
 
-          Mail::to($customer->email)->send(new WelcomeUserMail($customer));
+        // Kirim email sambutan
+        Mail::to($user->email)->send(new WelcomeUserMail($user));
 
-        // Login otomatis (jika mau)
-        Auth::guard('customer')->login($customer);
+        // Login otomatis
+        Auth::guard('customer')->login($user);
 
-        return redirect()->route('customer.login')->with('success', 'Registrasi berhasil, silakan cek email Anda!');                    
+        return redirect()->route('customer.profile')->with('success', 'Registrasi berhasil! Silakan cek email Anda.');
     }
 
-    public function showLoginForm() {
-        return view('customer.login');
+    public function showUnifiedLoginForm()
+    {
+        return view('auth.unified-login');
     }
 
-    public function login(Request $request) {
-        $credentials = $request->only('email', 'password');
+    public function login(Request $request)
+    {
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
 
-       if (Auth::guard('customer')->attempt($credentials)) {
-        return redirect()->route('products.index');
+        // Login sebagai admin
+        if (Auth::guard('admin')->attempt($credentials)) {
+            $request->session()->regenerate();
+            return redirect()->intended('/admin/dashboard');
+        }
+
+        // Login sebagai customer
+        if (Auth::guard('customer')->attempt($credentials)) {
+            $request->session()->regenerate();
+            return redirect()->intended('/profile');
+        }
+
+        return back()->withErrors([
+            'email' => 'Email atau password salah.',
+        ])->onlyInput('email');
     }
 
-    return back()->withErrors(['email' => 'Login gagal']);
-}
+    public function logout(Request $request)
+    {
+        if (Auth::guard('admin')->check()) {
+            Auth::guard('admin')->logout();
+        } elseif (Auth::guard('customer')->check()) {
+            Auth::guard('customer')->logout();
+        } elseif (Auth::check()) {
+            Auth::logout(); // default
+        }
 
-    public function logout() {
-        auth('customer')->logout();
-        return redirect()->route('products.index');
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect('/login');
     }
 }
